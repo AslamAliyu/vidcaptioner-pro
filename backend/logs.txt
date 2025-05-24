@@ -1,0 +1,23 @@
+INFO:     Will watch for changes in these directories: ['/Users/aslamaliyu/vidcaptioner-pro/backend']
+INFO:     Uvicorn running on http://127.0.0.1:8001 (Press CTRL+C to quit)
+INFO:     Started reloader process [4805] using StatReload
+INFO:     Started server process [4807]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:63918 - "POST /upload/ HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app/services/asr.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [4807]
+INFO:     Started server process [4861]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'app/services/asr.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [4861]
+INFO:     Started server process [4897]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
