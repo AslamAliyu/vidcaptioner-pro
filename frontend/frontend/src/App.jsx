@@ -1,8 +1,10 @@
+// App.jsx
 import { useState } from 'react';
 
 function App() {
   const [file, setFile] = useState(null);
   const [transcript, setTranscript] = useState("");
+  const [summary, setSummary] = useState(""); // 🌟 [May 25, 2025] Added for summary state
   const [loading, setLoading] = useState(false);
 
   const handleUpload = async () => {
@@ -18,11 +20,24 @@ function App() {
       });
       const data = await res.json();
       setTranscript(data.transcript || "No transcript returned.");
+      setSummary(""); // 🌟 [May 25, 2025] Clear previous summary on new upload
     } catch (err) {
       setTranscript("Error during upload/transcription.");
     } finally {
       setLoading(false);
     }
+  };
+
+  // 🌟 [May 25, 2025] Added: Summarization function
+  const handleSummarize = async () => {
+    if (!transcript) return;
+    const res = await fetch("http://localhost:8001/summarize/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(transcript),
+    });
+    const data = await res.json();
+    setSummary(data.summary);
   };
 
   return (
@@ -47,6 +62,22 @@ function App() {
         <div className="mt-4 p-4 bg-white rounded shadow w-full max-w-2xl">
           <h2 className="text-xl font-semibold mb-2">Transcript</h2>
           <p className="whitespace-pre-wrap">{transcript}</p>
+
+          {/* 🌟 [May 25, 2025] Added: Summarize button */}
+          <button
+            onClick={handleSummarize}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Summarize Transcript
+          </button>
+        </div>
+      )}
+
+      {/* 🌟 [May 25, 2025] Added: Summary display */}
+      {summary && (
+        <div className="mt-4 p-4 bg-gray-200 rounded shadow w-full max-w-2xl">
+          <h2 className="text-xl font-semibold mb-2">Summary</h2>
+          <p className="whitespace-pre-wrap">{summary}</p>
         </div>
       )}
     </div>
