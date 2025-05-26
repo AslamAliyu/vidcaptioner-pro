@@ -1,10 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function App() {
   const [file, setFile] = useState(null);
   const [transcript, setTranscript] = useState("");
-  const [summary, setSummary] = useState(""); // 🌟 [May 25, 2025] Added for summary state
+  const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme === "dark") setDarkMode(true);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   const handleUpload = async () => {
     if (!file) return alert("Please select a file first.");
@@ -19,7 +30,7 @@ function App() {
       });
       const data = await res.json();
       setTranscript(data.transcript || "No transcript returned.");
-      setSummary(""); // 🌟 [May 25, 2025] Clear previous summary on new upload
+      setSummary("");
     } catch (err) {
       setTranscript("Error during upload/transcription.");
     } finally {
@@ -27,7 +38,6 @@ function App() {
     }
   };
 
-  // 🌟 [May 25, 2025] Added: Summarization function
   const handleSummarize = async () => {
     if (!transcript) return;
     const res = await fetch("http://localhost:8001/summarize/", {
@@ -39,10 +49,8 @@ function App() {
     setSummary(data.summary);
   };
 
-  // 🌟 [May 26, 2025] Added: Subtitle (.srt) generation and download
   const handleDownloadSRT = async () => {
     if (!file) return alert("Upload a file first.");
-
     const formData = new FormData();
     formData.append("file", file);
 
@@ -61,53 +69,67 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100 space-y-4">
-      <h1 className="text-3xl font-bold text-blue-700">VidCaptioner Pro</h1>
+    <div className="min-h-screen transition bg-gradient-to-br from-white via-beige-50 to-beige-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-gray-800 dark:text-gray-100 font-sans">
+      <div className="flex justify-between items-center px-6 py-4">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-center">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-700 dark:from-yellow-300 dark:to-yellow-400">
+            VidCaptioner Pro
+          </span>
+        </h1>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+        </button>
+      </div>
 
-      <input
-        type="file"
-        accept="video/mp4"
-        onChange={(e) => setFile(e.target.files[0])}
-        className="bg-white border p-2 rounded"
-      />
+      <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 shadow-lg rounded-2xl p-6 space-y-6">
+        <input
+          type="file"
+          accept="video/mp4"
+          onChange={(e) => setFile(e.target.files[0])}
+          className="block w-full border border-gray-300 dark:border-gray-600 rounded p-2 text-sm bg-white dark:bg-slate-700"
+        />
 
-      <button
-        onClick={handleUpload}
-        className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-        {loading ? "Processing..." : "Upload & Transcribe"}
-      </button>
+        <button
+          onClick={handleUpload}
+          className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md shadow-md transition"
+        >
+          {loading ? "Processing..." : "Upload & Transcribe"}
+        </button>
 
-      {transcript && (
-        <div className="mt-4 p-4 bg-white rounded shadow w-full max-w-2xl">
-          <h2 className="text-xl font-semibold mb-2">Transcript</h2>
-          <p className="whitespace-pre-wrap">{transcript}</p>
+        {transcript && (
+          <div className="space-y-4">
+            <section className="bg-yellow-50 dark:bg-slate-700 rounded-md p-4 border border-yellow-200 dark:border-yellow-500">
+              <h2 className="text-xl font-semibold mb-2">📝 Transcript</h2>
+              <p className="text-sm whitespace-pre-wrap">{transcript}</p>
 
-          {/* 🌟 [May 25, 2025] Added: Summarize button */}
-          <button
-            onClick={handleSummarize}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Summarize Transcript
-          </button>
+              <div className="mt-3 flex gap-3 flex-wrap">
+                <button
+                  onClick={handleSummarize}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                >
+                  ✨ Summarize
+                </button>
+                <button
+                  onClick={handleDownloadSRT}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+                >
+                  🕒 Download Subtitles (.srt)
+                </button>
+              </div>
+            </section>
 
-          {/* 🌟 [May 26, 2025] Added: Subtitles download button */}
-          <button
-            onClick={handleDownloadSRT}
-            className="mt-2 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-          >
-            🕒 Generate Subtitles (.srt)
-          </button>
-        </div>
-      )}
-
-      {/* 🌟 [May 25, 2025] Added: Summary display */}
-      {summary && (
-        <div className="mt-4 p-4 bg-gray-200 rounded shadow w-full max-w-2xl">
-          <h2 className="text-xl font-semibold mb-2">Summary</h2>
-          <p className="whitespace-pre-wrap">{summary}</p>
-        </div>
-      )}
+            {summary && (
+              <section className="bg-brown-50 dark:bg-slate-700 rounded-md p-4 border border-brown-200 dark:border-brown-500">
+                <h2 className="text-xl font-semibold mb-2">📌 Summary</h2>
+                <p className="text-sm whitespace-pre-wrap">{summary}</p>
+              </section>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
