@@ -3,9 +3,13 @@ import os
 import ffmpeg
 import librosa
 from transformers import pipeline
+from transformers import pipeline, WhisperFeatureExtractor
+
 
 # Load Whisper ASR model from Hugging Face
 asr_pipeline = pipeline("automatic-speech-recognition", model="openai/whisper-small")
+
+asr_pipeline2 = pipeline("automatic-speech-recognition", model="openai/whisper-small", return_timestamps="word")
 
 def extract_audio(input_path: str) -> str:
     output_path = os.path.splitext(input_path)[0] + "_converted.wav"
@@ -46,3 +50,15 @@ def transcribe_audio(file_path: str) -> str:
         print(f"❌ ASR failed: {e}")
         sys.stdout.flush()
         return "Transcription failed."
+
+def transcribe_with_timestamps(file_path: str) -> list:
+    print(f"🎬 Extracting audio from: {file_path}")
+    wav_path = extract_audio(file_path)
+
+    try:
+        print("📚 Running Whisper with timestamps...")
+        result = asr_pipeline2(wav_path, return_timestamps="word")
+        return result.get("chunks", [])
+    except Exception as e:
+        print(f"❌ Timestamped ASR failed: {e}")
+        return []

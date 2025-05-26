@@ -1,4 +1,3 @@
-// App.jsx
 import { useState } from 'react';
 
 function App() {
@@ -40,6 +39,27 @@ function App() {
     setSummary(data.summary);
   };
 
+  // 🌟 [May 26, 2025] Added: Subtitle (.srt) generation and download
+  const handleDownloadSRT = async () => {
+    if (!file) return alert("Upload a file first.");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch("http://localhost:8001/generate-srt/", {
+      method: "POST",
+      body: formData,
+    });
+
+    const srtBlob = await res.blob();
+    const url = window.URL.createObjectURL(srtBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "captions.srt");
+    document.body.appendChild(link);
+    link.click();
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100 space-y-4">
       <h1 className="text-3xl font-bold text-blue-700">VidCaptioner Pro</h1>
@@ -69,6 +89,14 @@ function App() {
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             Summarize Transcript
+          </button>
+
+          {/* 🌟 [May 26, 2025] Added: Subtitles download button */}
+          <button
+            onClick={handleDownloadSRT}
+            className="mt-2 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          >
+            🕒 Generate Subtitles (.srt)
           </button>
         </div>
       )}
