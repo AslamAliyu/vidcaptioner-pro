@@ -1,12 +1,14 @@
 from fastapi import APIRouter, File, UploadFile, Body
+from fastapi.responses import Response
 import shutil
 import os
-from app.services.asr import transcribe_audio
-from app.services.summarize import summarize_text
-
-router = APIRouter()
 import traceback
 
+from app.services.asr import transcribe_audio, transcribe_with_timestamps  # ✅ [May 26, 2025] Added timestamped ASR
+from app.services.summarize import summarize_text
+from app.services.subtitles import generate_srt  # ✅ [May 26, 2025] Subtitle generator
+
+router = APIRouter()
 
 @router.post("/upload/")
 async def upload_video(file: UploadFile = File(...)):
@@ -36,3 +38,21 @@ async def summarize(transcript: str = Body(...)):
     except Exception as e:
         print(f"❌ Summarization error: {e}")
         return {"summary": "Summarization failed."}
+
+# ✅ [May 26, 2025] Added SRT subtitle generation route
+@router.post("/generate-srt/")
+async def generate_srt_endpoint(file: UploadFile = File(...)):
+    save_path = f"temp_uploads/{file.filename}"
+    os.makedirs("temp_uploads", exist_ok=True)
+
+    with open(save_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    try:
+        chunks = transcribe_with_timestamps(save_path)
+        srt_content = generate_srt(chunks)
+        return Response(content=srt_content, media_type="text/plain")
+    except Exception as e:
+        print(f"❌ SRT generation error: {e}")
+        traceback.print_exc()
+        return Response(content="Subtitle generation failed.", media_type="text/plain")
