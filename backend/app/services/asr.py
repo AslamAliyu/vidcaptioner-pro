@@ -1,17 +1,22 @@
-import sys
+# app/services/asr.py
+
 import os
+import requests
 import ffmpeg
-import librosa
-from transformers import pipeline
-from transformers import pipeline, WhisperFeatureExtractor
+import sys
 
+API_URL = "https://api-inference.huggingface.co/models/openai/whisper-small"
+HUGGINGFACE_API_TOKEN = os.getenv("HF_API_TOKEN")
 
-# Load Whisper ASR model from Hugging Face
-asr_pipeline = pipeline("automatic-speech-recognition", model="openai/whisper-small")
+headers = {
+    "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}"
+}
 
-asr_pipeline2 = pipeline("automatic-speech-recognition", model="openai/whisper-small", return_timestamps="word")
 
 def extract_audio(input_path: str) -> str:
+    """
+    Converts any audio/video file to mono 16kHz WAV for ASR processing.
+    """
     output_path = os.path.splitext(input_path)[0] + "_converted.wav"
     try:
         print(f"🎬 Running ffmpeg to extract audio to: {output_path}")
@@ -28,37 +33,31 @@ def extract_audio(input_path: str) -> str:
         sys.stdout.flush()
     return output_path
 
+
 def transcribe_audio(file_path: str) -> str:
+    """
+    Sends audio to Hugging Face Inference API for transcription.
+    """
     print(f"🎧 Extracting audio from: {file_path}")
     sys.stdout.flush()
 
     wav_path = extract_audio(file_path)
     if not os.path.exists(wav_path):
         print("❌ WAV file was not created.")
-        sys.stdout.flush()
         return "Failed to extract audio."
 
     try:
-        print("🧠 Running ASR...")
-        sys.stdout.flush()
-        audio, _ = librosa.load(wav_path, sr=16000)
-        result = asr_pipeline(audio, chunk_length_s=30, stride_length_s=5)
-        print("📝 Transcript result:", result)
-        sys.stdout.flush()
-        return result["text"]
+        with open(wav_path, "rb") as f:
+            print("🧠 Sending to Hugging Face API...")
+            response = requests.post(API_URL, headers=headers, data=f)
+
+        if response.status_code != 200:
+            print(f"❌ API Error: {response.status_code} - {response.text}")
+            return "Transcription failed."
+
+        result = response.json()
+        print("📝 Transcript:", result.get("text"))
+        return result.get("text", "Transcription failed.")
     except Exception as e:
-        print(f"❌ ASR failed: {e}")
-        sys.stdout.flush()
+        print(f"❌ ASR request failed: {e}")
         return "Transcription failed."
-
-def transcribe_with_timestamps(file_path: str) -> list:
-    print(f"🎬 Extracting audio from: {file_path}")
-    wav_path = extract_audio(file_path)
-
-    try:
-        print("📚 Running Whisper with timestamps...")
-        result = asr_pipeline2(wav_path, return_timestamps="word")
-        return result.get("chunks", [])
-    except Exception as e:
-        print(f"❌ Timestamped ASR failed: {e}")
-        return []
