@@ -24,7 +24,7 @@ function App() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8001/upload/", {
+      const res = await fetch(https://vidcaptioner-backend.onrender.com"/upload/", {
         method: "POST",
         body: formData,
       });
@@ -40,7 +40,7 @@ function App() {
 
   const handleSummarize = async () => {
     if (!transcript) return;
-    const res = await fetch("http://localhost:8001/summarize/", {
+    const res = await fetch("https://vidcaptioner-backend.onrender.com/summarize/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(transcript),
@@ -54,7 +54,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("http://localhost:8001/generate-srt/", {
+    const res = await fetch("https://vidcaptioner-backend.onrender.com/generate-srt/", {
       method: "POST",
       body: formData,
     });
