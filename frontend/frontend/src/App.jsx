@@ -69,67 +69,68 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen transition bg-gradient-to-br from-white via-beige-50 to-beige-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-gray-800 dark:text-gray-100 font-sans">
-      <div className="flex justify-between items-center px-6 py-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-center">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-700 dark:from-yellow-300 dark:to-yellow-400">
-            VidCaptioner Pro
-          </span>
-        </h1>
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
-          {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-        </button>
+    <div className="min-h-screen transition bg-[#fcfaf8] dark:bg-slate-900 text-[#1b140e] dark:text-gray-100 font-sans">
+      <div className="flex justify-between items-center px-10 py-3 border-b border-[#f3ede7]">
+        <div className="flex items-center gap-4">
+          <div className="text-2xl font-bold tracking-tight">VidCaptioner Pro</div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="rounded-lg h-10 px-4 bg-[#f3ede7] text-[#1b140e] text-sm font-bold tracking-wide"
+          >
+            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
+          </button>
+        </div>
       </div>
 
-      <div className="max-w-3xl mx-auto bg-white dark:bg-slate-800 shadow-lg rounded-2xl p-6 space-y-6">
-        <input
-          type="file"
-          accept="video/mp4"
-          onChange={(e) => setFile(e.target.files[0])}
-          className="block w-full border border-gray-300 dark:border-gray-600 rounded p-2 text-sm bg-white dark:bg-slate-700"
-        />
+      <main className="px-10 py-5 flex flex-col items-center">
+        <div className="w-full max-w-2xl space-y-6">
+          <div className="bg-white dark:bg-slate-800 shadow-md rounded-xl p-6">
+            <input
+              type="file"
+              accept="video/mp4"
+              onChange={(e) => setFile(e.target.files[0])}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded p-2 text-sm bg-white dark:bg-slate-700"
+            />
 
-        <button
-          onClick={handleUpload}
-          className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md shadow-md transition"
-        >
-          {loading ? "Processing..." : "Upload & Transcribe"}
-        </button>
-
-        {transcript && (
-          <div className="space-y-4">
-            <section className="bg-yellow-50 dark:bg-slate-700 rounded-md p-4 border border-yellow-200 dark:border-yellow-500">
-              <h2 className="text-xl font-semibold mb-2">📝 Transcript</h2>
-              <p className="text-sm whitespace-pre-wrap">{transcript}</p>
-
-              <div className="mt-3 flex gap-3 flex-wrap">
-                <button
-                  onClick={handleSummarize}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-                >
-                  ✨ Summarize
-                </button>
-                <button
-                  onClick={handleDownloadSRT}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-                >
-                  🕒 Download Subtitles (.srt)
-                </button>
-              </div>
-            </section>
-
-            {summary && (
-              <section className="bg-brown-50 dark:bg-slate-700 rounded-md p-4 border border-brown-200 dark:border-brown-500">
-                <h2 className="text-xl font-semibold mb-2">📌 Summary</h2>
-                <p className="text-sm whitespace-pre-wrap">{summary}</p>
-              </section>
-            )}
+            <div className="flex flex-wrap gap-4 mt-4">
+              <button
+                onClick={handleUpload}
+                className="flex-1 py-2 bg-[#ea9847] hover:bg-orange-500 text-white font-bold rounded"
+              >
+                {loading ? "Processing..." : "Upload & Transcribe"}
+              </button>
+              <button
+                onClick={handleSummarize}
+                className="flex-1 py-2 bg-[#f3ede7] hover:bg-[#ebded4] text-[#1b140e] font-bold rounded"
+              >
+                Summarize
+              </button>
+              <button
+                onClick={handleDownloadSRT}
+                className="flex-1 py-2 bg-[#f3ede7] hover:bg-[#ebded4] text-[#1b140e] font-bold rounded"
+              >
+                Download
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+
+          {transcript && (
+            <div className="bg-[#f3ede7] dark:bg-slate-700 rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-bold">📝 Transcript</h2>
+              <p className="whitespace-pre-wrap text-sm">{transcript}</p>
+            </div>
+          )}
+
+          {summary && (
+            <div className="bg-[#f3ede7] dark:bg-slate-700 rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-bold">📌 Summary</h2>
+              <p className="whitespace-pre-wrap text-sm">{summary}</p>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
