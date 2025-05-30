@@ -48,3 +48,8 @@ urllib3==2.4.0
 xxhash==3.5.0
 yarl==1.20.0
 uvicorn==0.29.0
+uvicorn[standard]
+fastapi
+ffmpeg-python
+transformers
+librosa
