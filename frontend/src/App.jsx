@@ -69,76 +69,60 @@ function App() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-[#fcfaf8] dark:bg-slate-900 text-[#1b140e] dark:text-gray-100 font-sans"
-      style={{ fontFamily: 'Newsreader, "Noto Sans", sans-serif' }}
-    >
-      <header className="flex items-center justify-between border-b border-[#f3ede7] px-10 py-3">
-        <div className="flex items-center gap-4">
-          <div className="w-4 h-4">
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg font-bold">Media Editor</h2>
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="px-3 py-1 rounded-lg bg-[#f3ede7] text-sm font-bold"
-          >
-            {darkMode ? "Light Mode" : "Dark Mode"}
-          </button>
-        </div>
+    <div className="min-h-screen bg-[#fcfaf8] dark:bg-slate-900 text-[#1b140e] dark:text-white font-sans px-6 py-4">
+      <header className="flex justify-between items-center border-b border-[#f3ede7] pb-3">
+        <h1 className="text-2xl font-bold">VidCaptioner Pro</h1>
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="bg-[#f3ede7] text-[#1b140e] px-4 py-2 rounded-md text-sm font-semibold"
+        >
+          {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
       </header>
 
-      <main className="px-10 py-6 max-w-5xl mx-auto">
-        <div className="flex flex-col gap-6">
+      <main className="max-w-3xl mx-auto mt-8 space-y-6">
+        <div className="space-y-4">
           <input
             type="file"
             accept="video/mp4"
             onChange={(e) => setFile(e.target.files[0])}
-            className="bg-white border border-gray-300 dark:border-gray-600 rounded p-2"
+            className="w-full border border-gray-300 p-2 rounded-md"
           />
-
           <div className="flex flex-wrap gap-4">
             <button
               onClick={handleUpload}
-              className="bg-[#ea9847] text-[#1b140e] px-4 py-2 rounded-lg font-bold"
+              className="bg-orange-400 text-white px-4 py-2 rounded-md"
             >
               {loading ? "Processing..." : "Upload & Transcribe"}
             </button>
             <button
               onClick={handleSummarize}
-              className="bg-[#f3ede7] text-[#1b140e] px-4 py-2 rounded-lg font-bold"
+              className="bg-[#f3ede7] text-[#1b140e] px-4 py-2 rounded-md"
             >
               Summarize
             </button>
             <button
               onClick={handleDownloadSRT}
-              className="bg-[#f3ede7] text-[#1b140e] px-4 py-2 rounded-lg font-bold"
+              className="bg-[#f3ede7] text-[#1b140e] px-4 py-2 rounded-md"
             >
-              Download
+              Download Subtitles
             </button>
           </div>
-
-          {transcript && (
-            <section className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-              <h3 className="text-xl font-bold mb-2">Transcript</h3>
-              <p className="text-sm whitespace-pre-wrap">{transcript}</p>
-            </section>
-          )}
-
-          {summary && (
-            <section className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-              <h3 className="text-xl font-bold mb-2">Summary</h3>
-              <p className="text-sm whitespace-pre-wrap">{summary}</p>
-            </section>
-          )}
         </div>
+
+        {transcript && (
+          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h2 className="font-bold text-lg mb-2">Transcript</h2>
+            <p className="whitespace-pre-wrap text-sm">{transcript}</p>
+          </div>
+        )}
+
+        {summary && (
+          <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h2 className="font-bold text-lg mb-2">Summary</h2>
+            <p className="whitespace-pre-wrap text-sm">{summary}</p>
+          </div>
+        )}
       </main>
     </div>
   );
