@@ -1,4 +1,5 @@
 from fastapi import APIRouter, File, UploadFile, Body
+from app.services.asr import transcribe_audio
 from fastapi.responses import Response
 import shutil
 import os
@@ -49,8 +50,8 @@ async def generate_srt_endpoint(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
 
     try:
-        chunks = transcribe_with_timestamps(save_path)
-        srt_content = generate_srt(chunks)
+        transcript = transcribe_audio(save_path)
+        srt_content = generate_srt(transcript)
         return Response(content=srt_content, media_type="text/plain")
     except Exception as e:
         print(f"❌ SRT generation error: {e}")

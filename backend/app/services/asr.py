@@ -4,18 +4,20 @@ import ffmpeg
 import sys
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '../../.env')
-load_dotenv(dotenv_path)
+
+# Hardcode relative path from backend/app/services/asr.py
+env_path = Path(__file__).parents[2] / ".env"
+load_dotenv(dotenv_path=env_path)
 
 HF_TOKEN = os.getenv("HF_TOKEN")
-
 if not HF_TOKEN:
     raise ValueError("❌ Hugging Face API token not found. Make sure HF_TOKEN is set in your .env file.")
+print("✅ Hugging Face token loaded:", HF_TOKEN[:8], "...")
 
 
-
-API_URL = "https://api-inference.huggingface.co/models/openai/whisper-small"
+API_URL = "https://api-inference.huggingface.co/models/openai/whisper"
 
 
 
