@@ -53,3 +53,5 @@ fastapi
 ffmpeg-python
 transformers
 librosa
+python-dotenv
+

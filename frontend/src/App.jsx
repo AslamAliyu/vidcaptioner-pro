@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const BACKEND_URL = "http://localhost:8001"; // Change to your deployed URL if needed
+
 function App() {
   const [file, setFile] = useState(null);
   const [transcript, setTranscript] = useState("");
@@ -24,7 +26,7 @@ function App() {
     formData.append("file", file);
 
     try {
-      const res = await fetch(https://vidcaptioner-backend.onrender.com"/upload/", {
+      const res = await fetch(`${BACKEND_URL}/upload/`, {
         method: "POST",
         body: formData,
       });
@@ -32,6 +34,7 @@ function App() {
       setTranscript(data.transcript || "No transcript returned.");
       setSummary("");
     } catch (err) {
+      console.error(err);
       setTranscript("Error during upload/transcription.");
     } finally {
       setLoading(false);
@@ -40,13 +43,17 @@ function App() {
 
   const handleSummarize = async () => {
     if (!transcript) return;
-    const res = await fetch("https://vidcaptioner-backend.onrender.com/summarize/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(transcript),
-    });
-    const data = await res.json();
-    setSummary(data.summary);
+    try {
+      const res = await fetch(`${BACKEND_URL}/summarize/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(transcript),
+      });
+      const data = await res.json();
+      setSummary(data.summary);
+    } catch (err) {
+      console.error("Summarization failed", err);
+    }
   };
 
   const handleDownloadSRT = async () => {
@@ -54,18 +61,21 @@ function App() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("https://vidcaptioner-backend.onrender.com/generate-srt/", {
-      method: "POST",
-      body: formData,
-    });
-
-    const srtBlob = await res.blob();
-    const url = window.URL.createObjectURL(srtBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "captions.srt");
-    document.body.appendChild(link);
-    link.click();
+    try {
+      const res = await fetch(`${BACKEND_URL}/generate-srt/`, {
+        method: "POST",
+        body: formData,
+      });
+      const srtBlob = await res.blob();
+      const url = window.URL.createObjectURL(srtBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "captions.srt");
+      document.body.appendChild(link);
+      link.click();
+    } catch (err) {
+      console.error("SRT download failed", err);
+    }
   };
 
   return (

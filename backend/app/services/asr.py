@@ -1,16 +1,27 @@
 # app/services/asr.py
-
-import os
 import requests
 import ffmpeg
 import sys
+import os
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '../../.env')
+load_dotenv(dotenv_path)
+
+HF_TOKEN = os.getenv("HF_TOKEN")
+
+if not HF_TOKEN:
+    raise ValueError("❌ Hugging Face API token not found. Make sure HF_TOKEN is set in your .env file.")
+
+
 
 API_URL = "https://api-inference.huggingface.co/models/openai/whisper-small"
-HUGGINGFACE_API_TOKEN = os.getenv("HF_API_TOKEN")
 
-headers = {
-    "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}"
-}
+
+
+
+headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+
 
 
 def extract_audio(input_path: str) -> str:
@@ -48,16 +59,18 @@ def transcribe_audio(file_path: str) -> str:
 
     try:
         with open(wav_path, "rb") as f:
-            print("🧠 Sending to Hugging Face API...")
-            response = requests.post(API_URL, headers=headers, data=f)
+            audio_bytes = f.read()
+            print(" Sending to Hugging Face API...")
+            response = requests.post(API_URL, headers=headers, data=audio_bytes)
 
         if response.status_code != 200:
-            print(f"❌ API Error: {response.status_code} - {response.text}")
+            print(f" API Error: {response.status_code} - {response.text}")
             return "Transcription failed."
 
         result = response.json()
         print("📝 Transcript:", result.get("text"))
         return result.get("text", "Transcription failed.")
+
     except Exception as e:
-        print(f"❌ ASR request failed: {e}")
+        print(f" ASR request failed: {e}")
         return "Transcription failed."
